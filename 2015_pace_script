@@ -1,0 +1,53 @@
+#!/usr/bin/python
+# this is for dates
+import datetime
+# this is for making and manipulating lists
+import pickle
+# this is to get the system write function to avoid newlines 
+# as you get with print
+import sys
+# we shall need some variables
+# all the miles is 2,015 miles
+all = float(2015)
+# get today's date from the system
+today = datetime.date.today()
+# convert to julian date
+julian = int(today.strftime('%j'))
+# get the average daily miles needed to keep pace
+pace_avg = float(2015/float(365))
+# how far should we be today?
+today_pace = pace_avg * julian
+# get that down to two decimal places and convert to string
+str_today_pace = str(round(today_pace,2))
+# get the mileage for today
+today_miles = raw_input("Enter today's miles: ")
+# start putting together the fb post
+fixed_sentence = 'I have a goal of running 2,015 miles in 2015. Based on the daily mileage average, I should have done %s by now.  ' % str_today_pace 
+# load the list
+# (if you don't have a list you will need to create an empty file or an error handler)
+run_days = pickle.load( open( "2015milepickle", "rb" ) )
+# put today's miles at the end of the list
+run_days.append(float(today_miles))
+# write the list to the file
+pickle.dump(run_days, open( "2015milepickle", "wb" ) )
+# figure out how many miles to go
+togo = (all - sum(run_days))
+# and how many are done
+done = 2015 - togo
+# second sentence of fb post
+today_sentence = "With the %s I did today, I have done %s; %s to go.  " % (today_miles, done, togo)
+# figure out how far off pace
+difference = done - today_pace
+# print an empty line
+print('\r\n') 
+# get the first line to the screen
+sys.stdout.write(fixed_sentence)
+# and the second line
+sys.stdout.write(today_sentence)
+# conditional for ahead / behind / on pace 
+if (difference > 0):
+   print('I am %s ahead of pace.') % str(abs(round(difference,2)))
+elif (difference < 0):
+   print('I am %s behind pace.') % str(abs(round(difference,2)))
+else:
+   print('I am on pace.')
